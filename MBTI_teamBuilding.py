@@ -6,14 +6,15 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import uic
 import random
+
 #TODO
 #StudentList 불러오기(완)
 #StudentList filePath 불러오기(완)
 #StudentList fileName 불러오기(완)
 #MBTI별로 분류하기(완)
 #spinBox로 팀원수, 팀수 입력받기(완)
-#teambuilding
-#TeamfilePath 불러오기
+#teambuilding(미완)
+#TeamfilePath 불러오기(미완)
 #exit 활성화(완)
 
 ###########################################################
@@ -37,7 +38,6 @@ class MainWindow(QMainWindow, form_class) :
         self.teamCountspin.valueChanged.connect(self.countTeam)
         self.teammateCountspin.valueChanged.connect(self.countTeammate)
         self.BuildTeam.clicked.connect(self.buildTeam)
-        # self.printTeamList.clicked.connect(self.exportTeamlist)
         self.Exit.clicked.connect(self.exit)
         self.studentList = []
         self.studentE = []
@@ -47,7 +47,6 @@ class MainWindow(QMainWindow, form_class) :
         self.teammate = []
         self.teamNum = 0
         self.teammateNum = 0
-        # self.show
         
         
     #학생명단 불러오기
@@ -67,7 +66,7 @@ class MainWindow(QMainWindow, form_class) :
         wb = op.load_workbook(path)
         sheet = wb.active
             
-            #excel 파일의 행과 열 입력
+        #excel 파일의 행과 열 입력
         maxCol = sheet.max_column
         maxRow = sheet.max_row
         sheetData = list(sheet.values)
