@@ -14,7 +14,7 @@ import random
 #MBTI별로 분류하기(완)
 #spinBox로 팀원수, 팀수 입력받기(완)
 #teambuilding(미완)
-#TeamfilePath 불러오기(미완)
+#TeamfilePath 불러오기(완)
 #exit 활성화(완)
 
 ###########################################################
@@ -159,11 +159,42 @@ class MainWindow(QMainWindow, form_class) :
                 wb.save(filename)
                 
                 #내보내기 파일 화면 표시
-                self.TeamPath.setPlainText(os.getcwd() + filename)
+                self.TeamPath.appendPlainText(os.getcwd() + filename)
                 
             
-    #         elif self.teammateNum%2 == 1:
-    #             return
+            elif self.teammateNum%2 == 1:
+                self.studentETeam = random.sample(self.studentE, int(self.teammateNum/2+1))
+                self.studentITeam = random.sample(self.studentI, int(self.teammateNum/2))
+                self.teammate.append(self.studentETeam)
+                self.teammate.append(self.studentITeam)
+                
+                #추출된 인원 리스트에서 삭제
+                if self.studentE == self.studentETeam:
+                    self.studentE.remove(self.studentETeam)
+                
+                #추출된 인원 리스트에서 삭제
+                if self.studentI == self.studentITeam:
+                    self.studentI.remove(self.studentITeam)
+
+                #3차원 리스트를 2차원 리스트로 변환(리스트 컴프리헨션)
+                self.realTeammate = [inner_list for outer_list in self.teammate for inner_list in outer_list]
+                # print('팀원 리스트:', self.realTeammate)
+                
+                wb = op.Workbook()
+                sheet = wb.active
+                sheet.append(["이름", "학번"])
+                filename = f'team{i+1}.xlsx'
+                print(filename)
+                
+                #엑셀에 데이터 입력
+                for Rows in range(self.teammateNum):
+                    sheet.append([self.realTeammate[Rows][0], str(self.realTeammate[Rows][1])])
+                
+                #엑셀 저장
+                wb.save(filename)
+                
+                #내보내기 파일 화면 표시
+                self.TeamPath.appendPlainText(os.getcwd() + filename)
         
            
 
