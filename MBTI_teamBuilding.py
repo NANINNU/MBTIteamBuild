@@ -135,11 +135,11 @@ class MainWindow(QMainWindow, form_class) :
                 
                 #추출된 인원 리스트에서 삭제
                 if self.studentE == self.studentETeam:
-                    self.studentE.remove(self.studentETeam)
+                    self.studentETeam.remove(self.studentE)
                 
                 #추출된 인원 리스트에서 삭제
                 if self.studentI == self.studentITeam:
-                    self.studentI.remove(self.studentITeam)
+                    self.studentITeam.remove(self.studentI)
 
                 #3차원 리스트를 2차원 리스트로 변환(리스트 컴프리헨션)
                 self.realTeammate = [inner_list for outer_list in self.teammate for inner_list in outer_list]
