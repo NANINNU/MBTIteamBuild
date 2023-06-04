@@ -14,6 +14,8 @@ import random
 #MBTI별로 분류하기(완)
 #spinBox로 팀원수, 팀수 입력받기(완)
 #teambuilding(미완)
+#학생들을 랜덤으로 뽑고, 뽑은 학생들은 기존의 리스트에서 제거해야함.(완)
+#학생수가 추출해야할 학생수보다 적은 경우 해결방법?
 #TeamfilePath 불러오기(완)
 #exit 활성화(완)
 
@@ -97,22 +99,17 @@ class MainWindow(QMainWindow, form_class) :
         
         for Row in range(dataMaxrow):
             if self.studentList[Row][2] == 'E':
-                self.studentE.append(self.studentList[Row][0:2])
+                self.studentE.append(self.studentList[Row][0:3])
                 
             
             elif self.studentList[Row][2] == 'I':
-                self.studentI.append(self.studentList[Row][0:2])
-                # print(self.studentI)
-            
+                self.studentI.append(self.studentList[Row][0:3])            
             
             else:
                 QMessageBox.information(self, '알림', 'MBTI에 오류가 있습니다')
             
         QMessageBox.information(self, '알림', '분류가 완료되었습니다')
-        # print(self.studentE)
-        # print('--------------')
-        # print(self.studentI)
-        
+
     #팀 개수 입력받기
     def countTeam(self):
         self.teamNum = self.teamCountspin.value()
@@ -121,10 +118,12 @@ class MainWindow(QMainWindow, form_class) :
     def countTeammate(self):
         self.teammateNum = self.teammateCountspin.value()
     
-    # #팀 만들기
+    #팀 만들기
     def buildTeam(self):
-        # print(type(self.teamNum))
-        # print(type(self.teammateNum))
+        
+        numE = 0
+        numI = 0
+
         for i in range(self.teamNum):
             if int(self.teammateNum%2) == 0:
                 
@@ -133,27 +132,26 @@ class MainWindow(QMainWindow, form_class) :
                 self.teammate.append(self.studentETeam)
                 self.teammate.append(self.studentITeam)
                 
-                #추출된 인원 리스트에서 삭제
-                if self.studentE == self.studentETeam:
-                    self.studentETeam.remove(self.studentE)
+                #추출된 인원 리스트에서 삭제(E학생)
+                for item in self.studentETeam:
+                    self.studentE.remove(item)
                 
-                #추출된 인원 리스트에서 삭제
-                if self.studentI == self.studentITeam:
-                    self.studentITeam.remove(self.studentI)
+                #추출된 인원 리스트에서 삭제(I학생)
+                for item in self.studentITeam:
+                    self.studentI.remove(item)
 
                 #3차원 리스트를 2차원 리스트로 변환(리스트 컴프리헨션)
                 self.realTeammate = [inner_list for outer_list in self.teammate for inner_list in outer_list]
-                # print('팀원 리스트:', self.realTeammate)
                 
                 wb = op.Workbook()
                 sheet = wb.active
-                sheet.append(["이름", "학번"])
+                sheet.append(["이름", "학번", "MBTI"])
                 filename = f'team{i+1}.xlsx'
                 print(filename)
                 
                 #엑셀에 데이터 입력
                 for Rows in range(self.teammateNum):
-                    sheet.append([self.realTeammate[Rows][0], str(self.realTeammate[Rows][1])])
+                    sheet.append([self.realTeammate[Rows][0], str(self.realTeammate[Rows][1]), self.realTeammate[Rows][2]])
                 
                 #엑셀 저장
                 wb.save(filename)
@@ -161,6 +159,52 @@ class MainWindow(QMainWindow, form_class) :
                 #내보내기 파일 화면 표시
                 self.TeamPath.appendPlainText(os.getcwd() + filename)
                 
+                #리스트 초기화
+                self.studentITeam = []
+                self.studentETeam = []
+                self.realTeammate = []
+                self.teammate = []
+                
+                #학생수가 추출해야할 학생수보다 적은 경우 해결방법?
+                if int(self.teammateNum/2) > len(self.studentE) or len(self.studentE) == 0:
+                    numE = len(self.studentE)
+                    numI = int(self.teammateNum)-numE
+                    self.studentETeam = random.sample(self.studentE, numE)
+                    self.studentITeam = random.sample(self.studentI, numI)
+                    self.teammate.append(self.studentETeam)
+                    self.teammate.append(self.studentITeam)
+                    #추출된 인원 리스트에서 삭제(E학생)
+                    for item in self.studentETeam:
+                        self.studentE.remove(item)
+                
+                #추출된 인원 리스트에서 삭제(I학생)
+                    for item in self.studentITeam:
+                        self.studentI.remove(item)
+
+                #3차원 리스트를 2차원 리스트로 변환(리스트 컴프리헨션)
+                    self.realTeammate = [inner_list for outer_list in self.teammate for inner_list in outer_list]
+                
+                    wb = op.Workbook()
+                    sheet = wb.active
+                    sheet.append(["이름", "학번", "MBTI"])
+                    filename = f'team{i+1}.xlsx'
+                    print(filename)
+                
+                #엑셀에 데이터 입력
+                    for Rows in range(self.teammateNum):
+                        sheet.append([self.realTeammate[Rows][0], str(self.realTeammate[Rows][1]), self.realTeammate[Rows][2]])
+                
+                #엑셀 저장
+                    wb.save(filename)
+                
+                #내보내기 파일 화면 표시
+                    self.TeamPath.appendPlainText(os.getcwd() + filename)
+                    self.studentITeam = []
+                    self.studentETeam = []
+                    self.realTeammate = []
+                    self.teammate = []
+                else: 
+                    numE = len(self.studentE)
             
             elif self.teammateNum%2 == 1:
                 self.studentETeam = random.sample(self.studentE, int(self.teammateNum/2+1))
@@ -168,17 +212,16 @@ class MainWindow(QMainWindow, form_class) :
                 self.teammate.append(self.studentETeam)
                 self.teammate.append(self.studentITeam)
                 
-                #추출된 인원 리스트에서 삭제
-                if self.studentE == self.studentETeam:
-                    self.studentE.remove(self.studentETeam)
-                
-                #추출된 인원 리스트에서 삭제
-                if self.studentI == self.studentITeam:
-                    self.studentI.remove(self.studentITeam)
+                #추출된 인원 리스트에서 삭제(E학생)
+                for item in self.studentETeam:
+                    self.studentE.remove(item)
+
+                #추출된 인원 리스트에서 삭제(I학생)
+                for item in self.studentITeam:
+                    self.studentI.remove(item)
 
                 #3차원 리스트를 2차원 리스트로 변환(리스트 컴프리헨션)
                 self.realTeammate = [inner_list for outer_list in self.teammate for inner_list in outer_list]
-                # print('팀원 리스트:', self.realTeammate)
                 
                 wb = op.Workbook()
                 sheet = wb.active
@@ -195,6 +238,12 @@ class MainWindow(QMainWindow, form_class) :
                 
                 #내보내기 파일 화면 표시
                 self.TeamPath.appendPlainText(os.getcwd() + filename)
+                
+                #리스트 초기화
+                self.studentITeam = []
+                self.studentETeam = []
+                self.teammate = []
+                self.realTeammate = []
         
            
 
